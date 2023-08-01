@@ -25,7 +25,14 @@ form.addEventListener("submit", (e) => {
   }
 })
 
-    async function getImages(id, page, perPage) {
+form.addEventListener("change", (e) => {
+  let valueChange = e.target.value;
+  page = 1;
+  getImages(valueChange, page, perPage);
+  totalHits(valueChange);
+})
+
+async function getImages(id, page, perPage) {
   try {
     const response = await fetch(`https://pixabay.com/api/?key=${apiKey}&q=${id}&image_type=photo&orientation=horizontal&safesearch=true&page=${page}&per_page=${perPage}`);
     let data = await response.json();
@@ -48,24 +55,29 @@ form.addEventListener("submit", (e) => {
     if (page === 1) {
     gallery.innerHTML = card;
     } else {
-      gallery.innerHTML += card;
+    gallery.innerHTML += card;
     }
     page += 1;
-    
-   let simplelightbox = new SimpleLightbox(".gallery a", {
+
+  let simplelightbox = new SimpleLightbox(".gallery a", {
     captionsData: `alt`,
     captionDelay: "250ms",
-   });
+  });
     
   } catch (error) {
   Notiflix.Notify.warning("Sorry, there are no images matching your search query. Please try again.");
       }
     }
 
-loadmoreButton.addEventListener("click", (e, page, perPage) => {
-  let idinputLoad = e.target.parentNode.childNodes[1].childNodes[1][0].value;
-  getImages(idinputLoad, page, perPage);
+loadmoreButton.addEventListener("click", (e) => {
+let q = (e.target.parentElement.firstElementChild.firstElementChild.firstElementChild.value);
+page += 1;
+loadmorePage(q, page);
 })
+
+async function loadmorePage(q, page) {
+getImages(q, page, 40)
+}
 
 async function totalHits(id) {
   const response = await fetch(`https://pixabay.com/api/?key=${apiKey}&q=${id}`);
